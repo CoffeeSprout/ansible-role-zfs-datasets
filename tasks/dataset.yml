@@ -1,0 +1,27 @@
+---
+# coffeesprout.zfs: create the dataset
+#
+- debug:
+    msg: "Dataset: {{ zfs_dataset.name }} with properties: {{ zfs_dataset.extra_zfs_properties }}"
+    verbosity: 1
+
+- name: setting _zfs_dataset_path when using programatic parents
+  set_fact:
+    _zfs_dataset_path:
+    - "{{ zfs_dataset.zpool | default(zfs_zpool) }}"
+    - "{{ zfs_dataset.parents }}"
+    - "{{ zfs_dataset.name }}"
+  when: 'zfs_dataset.parents is defined'
+
+- name: setting _zfs_dataset_patch when not using programatic parents (default)
+  set_fact:
+    _zfs_dataset_path:
+    - "{{ zfs_dataset.zpool | default(zfs_zpool) }}"
+    - "{{ zfs_dataset.name }}"
+  when: 'zfs_dataset.parents is not defined'
+
+- name: create zfs dataset
+  zfs:
+    name: "{{ _zfs_dataset_path |join('/') }}"
+    state: present
+    extra_zfs_properties: "{{ zfs_default_properties | combine(zfs_dataset.extra_zfs_properties) }}"

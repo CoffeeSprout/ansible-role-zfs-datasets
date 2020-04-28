@@ -1,0 +1,8 @@
+zfs_snapshot_default_excludes:
+- zroot/tmp
+- zroot/var
+- zroot/var/audit
+- zroot/var/crash
+- zroot/var/log
+- zroot/var/mail
+- zroot/var/tmp

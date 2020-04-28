@@ -1,0 +1,21 @@
+---
+# Setup automatic snapshotting of datasets
+#
+
+
+- name: setup crontab
+  template:
+    src: zfs-auto-snapshot
+    dest: /etc/cron.d/zfs-auto-snapshot
+
+- name: setup snapshot excludes
+  command: "zfs set com.sun:auto-snapshot=false {{ item }}"
+  when: 'zfs_snapshot_datasets is defined'
+  with_items:
+  - "{{ zfs_snapshot_default_excludes }}"
+  - "{{ zfs_snapshot_excludes }}"
+
+- name: setup snapshots on existing datasets
+  command: "zfs set com.sun:auto-snapshot=true {{ item }}"
+  with_items: "{{ zfs_snapshot_datasets }}"
+  when: 'zfs_snapshot_datasets is defined'

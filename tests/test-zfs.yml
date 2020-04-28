@@ -1,0 +1,10 @@
+---
+
+- hosts: all
+  become: True
+  roles:
+  - role: coffeesprout.zfs
+    zfs_dataset:
+      name: test1
+      extra_zfs_properties:
+        quota: 2G

@@ -1,0 +1,8 @@
+---
+# Installs some packages to manage ZFS with
+#
+
+- name: install packages
+  package:
+    name: "{{ zfs_backup_packages }} + {{ zfs_replication_packages }}"
+    state: present

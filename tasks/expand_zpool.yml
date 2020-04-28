@@ -1,0 +1,23 @@
+---
+
+#See also https://www.freebsd.org/doc/handbook/disks-growing.html
+#This is a very simple implementation for single vdev virtual servers
+
+- name: parse GPT status
+  command: gpart show {{ zpool_disk }}
+  register: gpart
+  changed_when: False
+
+- name: if any of the zpool_disks come back with a corrupted GPT we recover it
+  command: gpart recover {{ zpool_disk }}
+  register: gpt_recovered
+  when: "not ansible_check_mode and 'CORRUPT' in gpart.stdout"
+
+- name: resize the partition
+  command: gpart resize -i {{ zpool_partition }} {{ zpool_disk }}
+  register: part_resized
+  when: gpt_recovered is changed
+
+- name: signal zfs that the partition has expanded
+  command: zpool online -e {{ zpool }} /dev/{{ zpool_disk }}p{{ zpool_partition }}
+  when: part_resized is changed

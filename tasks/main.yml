@@ -1,0 +1,46 @@
+---
+# Main task file coffeesprout.zfs
+
+- name: ensure OS specifics are included
+  include_vars: "{{ item }}"
+  with_first_found:
+  - "{{ ansible_os_family }}.yml"
+
+#Install required tools
+- include_tasks: install.yml
+  tags:
+  - packages
+
+- include_tasks: snapshots.yml
+  tags:
+  - snapshots
+
+- include_tasks: expand_zpool.yml
+  when: 'zpool is defined and zpool_partition is defined and zpool_disk is defined'
+  tags:
+  - zpool
+
+- include_tasks: expand_zpool.yml
+  vars:
+    zpool: "{{ item.zpool }}"
+    zpool_partition: "{{ item.zpool_partition }}"
+    zpool_disk: "{{ item.zpool_disk }}"
+  with_items:
+  - "{{ expand_zpools }}"
+  tags:
+  - zpool
+
+#Single zfs_dataset
+- include_tasks: dataset.yml
+  when: 'zfs_dataset is defined'
+  tags:
+  - datasets
+
+#Multiple zfs_datasets
+- include_tasks: dataset.yml
+  vars:
+    zfs_dataset: "{{ item }}"
+  with_items:
+  - "{{ zfs_datasets }}"
+  tags:
+  - datasets

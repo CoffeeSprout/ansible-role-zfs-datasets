@@ -1,0 +1,20 @@
+---
+# defaults file for coffeesprout.zfs
+
+zfs_datasets: []
+expand_zpools: []
+
+zfs_zpool: "zroot"
+
+zfs_backup_packages:
+- zfstools
+
+zfs_replication_packages:
+- zxfer
+
+zfs_default_properties:
+  com.sun:auto-snapshot: "true"
+
+zfs_snapshot_default_excludes: []
+
+zfs_snapshot_excludes: []
